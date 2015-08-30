@@ -108,14 +108,7 @@ SPIFF_FILES ?= files
 BUILD_BASE	= out/build
 FW_BASE		= out/firmware
 
-ifdef SPIFF_START_OFFSET
-	TEMP_OFFSET := $(SPIFF_START_OFFSET)
-	SPIFF_START_OFFSET = $(shell printf '0x%X\n' $$(( $(TEMP_OFFSET) & 0xFFFFC000 )) )
-else
-	CODE_END = $(shell printf '0x%x' $$($(READELF) -s $(TARGET_OUT) | gawk -F " " '/_flash_code_end/ {printf("0x%x", strtonum("0x" $$2) - 0x40200000)}'))
-	SPIFF_START_OFFSET ?= $(shell printf '0x%X\n' $$(( ($(CODE_END) + 16384) & (0xFFFFC000) )) )
-endif
-
+SPIFF_START_OFFSET = $(shell printf '0x%X\n' $$(( ($$($(GET_FILESIZE) $(FW_BASE)/0x09000.bin) + 16384 + 36864) & (0xFFFFC000) )) )
 
 #Firmware memory layout info files
 FW_MEMINFO_NEW = $(FW_BASE)/fwMeminfo.new
@@ -220,7 +213,6 @@ AR		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-ar
 LD		:= $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-gcc
 OBJCOPY := $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-objcopy
 OBJDUMP := $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-objdump
-READELF := $(XTENSA_TOOLS_ROOT)/xtensa-lx106-elf-readelf
 
 SRC_DIR		:= $(MODULES)
 BUILD_DIR	:= $(addprefix $(BUILD_BASE)/,$(MODULES))

@@ -17,7 +17,7 @@ MODULES = app
 # SMING_HOME = c:/tools/sming/Sming 
 
 # MacOS / Linux
-# SMING_HOME = /opt/sming/sming
+# SMING_HOME = /opt/sming/Sming
 
 ## COM port parameter is reqruied to flash firmware correctly.
 ## Windows: 
@@ -31,7 +31,3 @@ MODULES = app
 
 # SPIFFs Location
 SPIFF_FILES = web/build
-
-SPIFF_START_OFFSET = 0x52000
-SPIFF_SIZE = 262144
-

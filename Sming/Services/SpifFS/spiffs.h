@@ -457,10 +457,9 @@ u32_t SPIFFS_buffer_bytes_for_cache(spiffs *fs, u32_t num_pages);
 
 
 void spiffs_mount();
-void spiffs_mount_manual(u32_t phys_addr, u32_t phys_size);
 void spiffs_unmount();
 bool spiffs_format();
-bool spiffs_format_manual(u32_t phys_addr, u32_t phys_size);
+bool spiffs_format_internal();
 spiffs_config spiffs_get_storage_config();
 extern void test_spiffs();
 

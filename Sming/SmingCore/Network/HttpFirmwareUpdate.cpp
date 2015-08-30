@@ -1,7 +1,7 @@
 /*
  * HttpFirmwareUpdate.cpp
  *
- *  Created on: 26 пїЅпїЅпїЅ. 2015 пїЅ.
+ *  Created on: 26 апр. 2015 г.
  *      Author: Anakod
  */
 
@@ -33,8 +33,8 @@ void HttpFirmwareUpdate::start()
 {
 	WDT.enable(false);
 	spiffs_unmount();
+	spiffs_format_internal();
 	spiffs_config cfg = spiffs_get_storage_config();
-	spiffs_format();
 	pos = cfg.phys_addr;
 
 	timer.initializeMs(500, TimerDelegate(&HttpFirmwareUpdate::onTimer, this)).start();
