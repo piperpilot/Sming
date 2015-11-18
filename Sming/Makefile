@@ -102,7 +102,7 @@ TARGET		= app
 
 # which modules (subdirectories) of the project to include in compiling
 MODULES		= system system/helpers Wiring SmingCore appinit $(filter %/, $(wildcard SmingCore/*/)) $(filter %/, $(wildcard Services/*/)) $(filter %/, $(wildcard Libraries/*/))
-EXTRA_INCDIR    = include include  system/include Wiring Libraries SmingCore $(SDK_BASE)/../include
+EXTRA_INCDIR    = include system/include Wiring Libraries SmingCore rboot rboot/appcode $(SDK_BASE)/../include
 
 # libraries used in this project, mainly provided by the SDK
 USER_LIBDIR = compiler/lib
@@ -157,10 +157,6 @@ INCDIR	:= $(addprefix -I,$(SRC_DIR))
 EXTRA_INCDIR	:= $(addprefix -I,$(EXTRA_INCDIR))
 MODULE_INCDIR	:= $(addsuffix /include,$(INCDIR))
 
-ifeq ($(DISABLE_SPIFFS), 1)
-	CFLAGS += -DDISABLE_SPIFFS=1
-endif
-
 V ?= $(VERBOSE)
 ifeq ("$(V)","1")
 Q :=
@@ -190,17 +186,21 @@ $1/%.o: %.cpp
 	$(Q) $(CXX) $(INCDIR) $(MODULE_INCDIR) $(EXTRA_INCDIR) $(SDK_INCDIR) $(CXXFLAGS)  -c $$< -o $$@
 endef
 
-.PHONY: all checkdirs clean
+.PHONY: all checkdirs clean spiffy
 
-all: checkdirs $(APP_AR) $(FW_FILE_1) $(FW_FILE_2)
+all: checkdirs $(APP_AR)
+
+spiffy: spiffy/spiffy
+
+spiffy/spiffy:
+	$(vecho) "Making spiffy utility"
+	$(Q) $(MAKE) --no-print-directory -C spiffy V=$(V)
+	$(vecho) "Done"
 
 $(APP_AR): $(OBJ)
 	$(vecho) "AR $@"
 	$(Q) $(AR) cru $@ $^
 	$(vecho) "Installing libsming"
-ifeq ($(DISABLE_SPIFFS), 1)
-	$(vecho) "(!) Spiffs support disabled. Remove 'DISABLE_SPIFFS' make argument to enable spiffs."
-endif
 	$(Q) cp -r $(APP_AR) $(USER_LIBDIR)/libsming.a  
 	$(vecho) "Done"
 
@@ -221,5 +221,6 @@ clean:
 	$(Q) rm -rf $(BUILD_DIR)
 	$(Q) rm -rf $(BUILD_BASE)
 	$(Q) rm -rf $(FW_BASE)
+	$(Q) $(MAKE) --no-print-directory -C spiffy clean V=$(V)
 
 $(foreach bdir,$(BUILD_DIR),$(eval $(call compile-objects,$(bdir))))
